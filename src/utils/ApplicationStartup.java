@@ -21,13 +21,13 @@ public class ApplicationStartup {
             switch (commandLineArguments.getTask()) {
                 case ApplicationTask.HUFFMAN_COMPRESSION:
                     huffmanEncodingController.compress(
-                        commandLineArguments.getInputFilePath(), 
+                        commandLineArguments.getInputFilePath(),
                         commandLineArguments.getOutputFilePath()
                     );
                     break;
                 case ApplicationTask.HUFFMAN_DECOMPRESSION:
                     huffmanEncodingController.decompress(
-                        commandLineArguments.getInputFilePath(), 
+                        commandLineArguments.getInputFilePath(),
                         commandLineArguments.getOutputFilePath()
                     );
                     break;

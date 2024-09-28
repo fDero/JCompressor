@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BitSequence {
-    
+
     private BitSet bitSet = new BitSet();
     private int size = 0;
 

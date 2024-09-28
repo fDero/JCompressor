@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.springframework.cache.annotation.Cacheable;
 
 public class SymbolTable {
-    
+
     private final Map<Integer, Long> occurrencyMap;
     private long totalNumberOfSymbols = 0L;
 
@@ -24,7 +24,7 @@ public class SymbolTable {
     }
 
     public double getFrequency(int integerEncodedByte) {
-        return (totalNumberOfSymbols == 0)? 
+        return (totalNumberOfSymbols == 0)?
             0 : getOccurrency(integerEncodedByte) / (double) totalNumberOfSymbols;
     }
 

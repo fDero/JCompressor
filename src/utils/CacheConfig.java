@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CacheConfig {
 
-    @Bean 
+    @Bean
     @SuppressWarnings("rawtypes")
     public Caffeine caffeineConfig() {
         return Caffeine.newBuilder()

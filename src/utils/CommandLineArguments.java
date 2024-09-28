@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 public class CommandLineArguments {
-    
+
     @Option(name = "-i", aliases = "--input", required = true, usage = "Input file path")
     private String inputFilePath;
 

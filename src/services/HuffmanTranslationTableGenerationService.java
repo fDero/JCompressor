@@ -6,19 +6,21 @@ import java.util.PriorityQueue;
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.Comparable;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 import model.BitSequence;
 import model.HuffmanTranslationTable;
 import model.SymbolTable;
 
 @Service
 public final class HuffmanTranslationTableGenerationService {
-    
-    static sealed interface HuffmanTreeNode 
+
+    static sealed interface HuffmanTreeNode
         extends Comparable<HuffmanTreeNode>
-        permits LeafHuffmanTreeNode, BranchHuffmanTreeNode 
-    {        
+        permits LeafHuffmanTreeNode, BranchHuffmanTreeNode
+    {
         long getOccurrency();
 
         @Override
@@ -30,15 +32,15 @@ public final class HuffmanTranslationTableGenerationService {
     @Getter
     @AllArgsConstructor
     private static final class LeafHuffmanTreeNode implements HuffmanTreeNode {
-        
+
         private final long occurrency;
         private final byte symbol;
-    } 
+    }
 
     @Getter
     @AllArgsConstructor
     private static final class BranchHuffmanTreeNode implements HuffmanTreeNode {
-    
+
         private final long occurrency;
         private final HuffmanTreeNode left;
         private final HuffmanTreeNode right;

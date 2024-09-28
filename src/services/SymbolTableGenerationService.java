@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 @Service
 public final class SymbolTableGenerationService {
-    
+
     public static class SymbolTableBuilder {
 
         private final Map<Integer, Long> occurrencyMap = new HashMap<>();
