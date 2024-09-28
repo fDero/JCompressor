@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.lang.Comparable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import model.BitSequence;
 import model.HuffmanTranslationTable;
 import model.SymbolTable;
-import utils.BitSequence;
 
 @Service
 public final class HuffmanTranslationTableGenerationService {
