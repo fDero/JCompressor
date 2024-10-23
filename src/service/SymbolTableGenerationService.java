@@ -22,14 +22,14 @@ public final class SymbolTableGenerationService {
         }
 
         void addSymbol(int integerEncodedByte) {
-            long frequency = occurrencyMap.getOrDefault(integerEncodedByte, Long.valueOf(0));
+            long frequency = occurrencyMap.getOrDefault(integerEncodedByte, 0L);
             occurrencyMap.put(integerEncodedByte, frequency + 1);
         }
 
         public SymbolTable consideringEOF() {
             assert !alreadyBuilt;
             assert !occurrencyMap.containsKey(-1);
-            occurrencyMap.put(-1, Long.valueOf(1));
+            occurrencyMap.put(-1, 1L);
             alreadyBuilt = true;
             return new SymbolTable(occurrencyMap);
         }
@@ -50,7 +50,7 @@ public final class SymbolTableGenerationService {
 
     public SymbolTableBuilder createFromInputStream(InputStream inputStream) throws IOException {
         SymbolTableBuilder builder = new SymbolTableBuilder();
-        int integerEncodedByte = -1;
+        int integerEncodedByte;
         while ((integerEncodedByte = inputStream.read()) != -1) {
             builder.addSymbol(integerEncodedByte);
         }

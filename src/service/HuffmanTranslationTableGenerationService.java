@@ -10,14 +10,14 @@ import java.lang.Comparable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import model.BitSequence;
+import io.github.fdero.bits4j.core.BitList;
 import model.HuffmanTranslationTable;
 import model.SymbolTable;
 
 @Service
 public final class HuffmanTranslationTableGenerationService {
 
-    static sealed interface HuffmanTreeNode
+    sealed interface HuffmanTreeNode
         extends Comparable<HuffmanTreeNode>
         permits LeafHuffmanTreeNode, BranchHuffmanTreeNode
     {
@@ -27,14 +27,14 @@ public final class HuffmanTranslationTableGenerationService {
         default int compareTo(HuffmanTreeNode other) {
             return Long.compare(this.getOccurrency(), other.getOccurrency());
         }
-    };
+    }
 
     @Getter
     @AllArgsConstructor
     private static final class LeafHuffmanTreeNode implements HuffmanTreeNode {
 
         private final long occurrency;
-        private final byte symbol;
+        private final int symbol;
     }
 
     @Getter
@@ -50,7 +50,6 @@ public final class HuffmanTranslationTableGenerationService {
         PriorityQueue<HuffmanTreeNode> priorityQueue = new PriorityQueue<>();
         symbolTable.streamFromLeastFrequent().forEach(integerEncodedByte -> {
             long occurrency = symbolTable.getOccurrency(integerEncodedByte);
-            assert integerEncodedByte != null;
             assert integerEncodedByte >= 0;
             assert integerEncodedByte <= 255;
             byte byteValue = (byte) integerEncodedByte.intValue();
@@ -64,29 +63,30 @@ public final class HuffmanTranslationTableGenerationService {
         while (priorityQueue.size() > 1) {
             HuffmanTreeNode left = priorityQueue.poll();
             HuffmanTreeNode right = priorityQueue.poll();
+            assert right != null;
             long occurrency = left.getOccurrency() + right.getOccurrency();
             priorityQueue.add(new BranchHuffmanTreeNode(occurrency, left, right));
         }
         return priorityQueue.poll();
     }
 
-    void fillHuffmanTranslationTableFromHuffmanTree(Map<Byte, BitSequence> translationMap, HuffmanTreeNode huffmanTree, BitSequence prefix) {
-        if (huffmanTree instanceof LeafHuffmanTreeNode) {
-            LeafHuffmanTreeNode leaf = (LeafHuffmanTreeNode) huffmanTree;
+    void fillHuffmanTranslationTableFromHuffmanTree(Map<Integer, BitList> translationMap, HuffmanTreeNode huffmanTree, BitList prefix) {
+        if (huffmanTree instanceof LeafHuffmanTreeNode leaf) {
             translationMap.put(leaf.getSymbol(), prefix);
-        } else if (huffmanTree instanceof BranchHuffmanTreeNode) {
-            BranchHuffmanTreeNode branch = (BranchHuffmanTreeNode) huffmanTree;
-            BitSequence leftPrefix = prefix.generateCopy().pushZero();
-            BitSequence rightPrefix = prefix.pushOne();
+        } else if (huffmanTree instanceof BranchHuffmanTreeNode branch) {
+            BitList leftPrefix = new BitList();
+            leftPrefix.addAll(prefix);
+            leftPrefix.addZero();
+            prefix.addOne();
             fillHuffmanTranslationTableFromHuffmanTree(translationMap, branch.getLeft(), leftPrefix);
-            fillHuffmanTranslationTableFromHuffmanTree(translationMap, branch.getRight(), rightPrefix);
+            fillHuffmanTranslationTableFromHuffmanTree(translationMap, branch.getRight(), prefix);
         }
     }
 
     public HuffmanTranslationTable generateTranslationTable(SymbolTable symbolTable) {
         HuffmanTreeNode huffmanTree = generateHuffmanTree(symbolTable);
-        Map<Byte, BitSequence> translationMap = new HashMap<>();
-        fillHuffmanTranslationTableFromHuffmanTree(translationMap, huffmanTree, new BitSequence());
+        Map<Integer, BitList> translationMap = new HashMap<>();
+        fillHuffmanTranslationTableFromHuffmanTree(translationMap, huffmanTree, new BitList());
         return new HuffmanTranslationTable(translationMap);
     }
 }

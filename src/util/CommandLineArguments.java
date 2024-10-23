@@ -17,7 +17,7 @@ public class CommandLineArguments {
     @Option(name = "-o", aliases = "--output", required = true, usage = "Output file path")
     private String outputFilePath;
 
-    @Option(name = "-t", aliases = "--task", required = false, usage = "Policy explining output file should be derived from the input file")
+    @Option(name = "-t", aliases = "--task", required = false, usage = "Policy explaining output file should be derived from the input file")
     private ApplicationTask task;
 
     public void parse(String[] args) {

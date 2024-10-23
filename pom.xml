@@ -7,10 +7,10 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>dero</groupId>
-    <artifactId>SampleProgram</artifactId>
+    <artifactId>JCompressor</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SampleProject</name>
-    <description>A brief and simple description</description>
+    <name>JCompressor</name>
+    <description>A simple command line tool for file compression</description>
     <properties>
         <java.version>21</java.version>
     </properties>
@@ -90,12 +90,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>6.0.11</version>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
-            <version>3.1.4</version>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -112,6 +112,11 @@
             <groupId>args4j</groupId>
             <artifactId>args4j</artifactId>
             <version>2.37</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.fdero</groupId>
+            <artifactId>bits4j</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 </project>

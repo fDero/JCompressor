@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 
 import controller.HuffmanEncodingController;
 
+import java.util.Arrays;
+
 @Configuration
 @ComponentScan(basePackages = {"controller", "service"})
 public class ApplicationStartup {
@@ -35,7 +37,7 @@ public class ApplicationStartup {
         }
         catch(Exception e) {
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+            System.out.println(Arrays.toString(e.getStackTrace()));
             System.exit(1);
         }
     }

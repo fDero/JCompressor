@@ -31,7 +31,6 @@ public class HuffmanEncodingController {
 
     public void compress(String inputFilePath, String outputFilePath)
         throws
-            FileNotFoundException,
             IOException
     {
         System.out.println("Compressing file " + inputFilePath + " to " + outputFilePath);

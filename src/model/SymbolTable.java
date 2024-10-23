@@ -1,34 +1,35 @@
 package model;
 
+import lombok.Getter;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.springframework.cache.annotation.Cacheable;
-
 public class SymbolTable {
 
     private final Map<Integer, Long> occurrencyMap;
-    private long totalNumberOfSymbols = 0L;
+
+    @Getter
+    private long totalNumberOfOccurrencies = 0L;
 
     @SuppressWarnings("unused")
     private final String uniqueTableId = UUID.randomUUID().toString();
 
     public SymbolTable(Map<Integer, Long> occurrencyMap) {
         this.occurrencyMap = occurrencyMap;
-        occurrencyMap.forEach((symbol, occurrence) -> totalNumberOfSymbols += occurrence);
+        occurrencyMap.forEach((symbol, occurrence) -> totalNumberOfOccurrencies += occurrence);
     }
 
     public long getOccurrency(int integerEncodedByte) {
-        return occurrencyMap.getOrDefault(integerEncodedByte, Long.valueOf(0));
+        return occurrencyMap.getOrDefault(integerEncodedByte, 0L);
     }
 
     public double getFrequency(int integerEncodedByte) {
-        return (totalNumberOfSymbols == 0)?
-            0 : getOccurrency(integerEncodedByte) / (double) totalNumberOfSymbols;
+        return (totalNumberOfOccurrencies == 0)?
+            0 : getOccurrency(integerEncodedByte) / (double) totalNumberOfOccurrencies;
     }
 
-    @Cacheable(value="cumulativeFrequencies", key="#integerEncodedByte + '-' + #uniqueTableId")
     public double getLowerCumulativeFrequency(int integerEncodedByte) {
         double cumulativeFrequency = 0;
         for (Map.Entry<Integer, Long> entry : occurrencyMap.entrySet()) {
@@ -54,5 +55,37 @@ public class SymbolTable {
         return occurrencyMap.entrySet().stream()
             .sorted(Map.Entry.comparingByValue())
             .map(Map.Entry::getKey);
+    }
+
+    public Stream<Long> streamOccurrenciesDesc() {
+        return occurrencyMap.entrySet().stream()
+                .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
+                .map(Map.Entry::getValue);
+    }
+
+    public Stream<Long> streamOccurrenciesAsc() {
+        return occurrencyMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .map(Map.Entry::getValue);
+    }
+
+    public int getTotalNumberOfDifferentSymbols() {
+        return occurrencyMap.entrySet().size();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof SymbolTable otherSymbolTable) {
+            return occurrencyMap.equals(otherSymbolTable.occurrencyMap);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return occurrencyMap.hashCode();
     }
 }
