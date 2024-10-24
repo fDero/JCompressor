@@ -2,15 +2,20 @@ package service;
 
 import io.github.fdero.bits4j.core.BitList;
 import io.github.fdero.bits4j.core.BitListConversions;
+import io.github.fdero.bits4j.core.BitValue;
+import io.github.fdero.bits4j.stream.BitWriter;
 import model.SymbolTable;
+import model.SymbolTableBuilder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @Service
-public class SymbolTableEncodingService {
+public class SymbolTableManagementService {
 
-    public BitList encodeSymbolTable(SymbolTable symbolTable) {
+    public BitList writeEncodedSymbolTableToOutputFile(SymbolTable symbolTable) {
         BitList encodedSymbolTable = new BitList();
         encodedSymbolTable.addAll(BitListConversions.fromInt(symbolTable.getTotalNumberOfDifferentSymbols()));
         symbolTable.streamFromMostFrequent().forEachOrdered(plainTextSymbol -> encodedSymbolTable.addAll(BitListConversions.fromInt(plainTextSymbol)));
@@ -40,5 +45,28 @@ public class SymbolTableEncodingService {
             occurrencyMap.put(symbol, occurrency);
         }
         return new SymbolTable(occurrencyMap);
+    }
+
+    public SymbolTableBuilder createFromOccurrencyMap(Map<Integer, Long> occurrencyMap) {
+        SymbolTableBuilder builder = new SymbolTableBuilder();
+        occurrencyMap.forEach(builder::putSymbol);
+        return builder;
+    }
+
+    public SymbolTableBuilder createFromInputStream(InputStream inputStream) throws IOException {
+        SymbolTableBuilder builder = new SymbolTableBuilder();
+        int integerEncodedByte;
+        while ((integerEncodedByte = inputStream.read()) != -1) {
+            builder.addSymbol(integerEncodedByte);
+        }
+        return builder;
+    }
+
+    public void writeEncodedSymbolTableToOutputFile(SymbolTable symbolTable, BitWriter bitWriter)
+            throws IOException
+    {
+        for (BitValue bit : writeEncodedSymbolTableToOutputFile(symbolTable)) {
+            bitWriter.write(bit);
+        }
     }
 }

@@ -12,26 +12,46 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SymbolTableEncodingServiceTest {
+class SymbolTableManagementServiceTest {
 
     private final int characterA = 'a';
     private final int characterB = 'b';
     private final int characterC = 'c';
     private final int characterD = 'd';
 
-    private final SymbolTable exampleSymbolTable = new SymbolTable(Map.of(
+    private final Map<Integer, Long> exampleOccurrencyMap = Map.of(
             characterA, 3L,
             characterB, 2L,
             characterC, 1L,
             characterD, 1L
-    ));
+    );
 
-    private final SymbolTableEncodingService symbolTableEncodingService
-            = new SymbolTableEncodingService();
+    private final SymbolTable exampleSymbolTable = new SymbolTable(exampleOccurrencyMap);
+
+    private final SymbolTableManagementService symbolTableManagementService
+            = new SymbolTableManagementService();
+
+    @Test
+    void generateFromOccurrencyMapWithoutEOF() {
+        SymbolTable symbolTable = symbolTableManagementService
+                .createFromOccurrencyMap(exampleOccurrencyMap)
+                .withoutConsideringEOF();
+        assertEquals(symbolTable.getTotalNumberOfDifferentSymbols(), 4);
+        assertEquals(symbolTable.getTotalNumberOfOccurrencies(), 7);
+    }
+
+    @Test
+    void generateFromOccurrencyMapWithEOF() {
+        SymbolTable symbolTable = symbolTableManagementService
+                .createFromOccurrencyMap(exampleOccurrencyMap)
+                .consideringEOF();
+        assertEquals(symbolTable.getTotalNumberOfDifferentSymbols(), 5);
+        assertEquals(symbolTable.getTotalNumberOfOccurrencies(), 8);
+    }
 
     @Test
     void encodeSymbolTableOverallFormatTest() {
-        BitList encodedSymbolTable = symbolTableEncodingService.encodeSymbolTable(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
         int expectedBitSequenceLength = 32;
         expectedBitSequenceLength += 32 * exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         expectedBitSequenceLength += 64 * exampleSymbolTable.getTotalNumberOfDifferentSymbols();
@@ -42,7 +62,7 @@ class SymbolTableEncodingServiceTest {
 
     @Test
     void encodeSymbolTablePreambleContentTest() {
-        BitList encodedSymbolTable = symbolTableEncodingService.encodeSymbolTable(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
         BitList first32bits = new BitList();
         first32bits.addAll(encodedSymbolTable.subList(0, 32));
         assertEquals(exampleSymbolTable.getTotalNumberOfDifferentSymbols(), BitListConversions.asInt(first32bits));
@@ -50,7 +70,7 @@ class SymbolTableEncodingServiceTest {
 
     @Test
     void encodeSymbolTableAlphabetSectionContentTest() {
-        BitList encodedSymbolTable = symbolTableEncodingService.encodeSymbolTable(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
         int totalNumberOfSymbols = exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         int bitOffset = 32;
         List<Integer> retrievedSymbols = new ArrayList<>();
@@ -70,7 +90,7 @@ class SymbolTableEncodingServiceTest {
 
     @Test
     void encodeSymbolTableEncodedOccurrenciesSectionContentTest() {
-        BitList encodedSymbolTable = symbolTableEncodingService.encodeSymbolTable(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
         int totalNumberOfSymbols = exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         int bitOffset = 32 + 32 * totalNumberOfSymbols;
         List<Long> retrievedOccurrencies = new ArrayList<>();
@@ -90,8 +110,8 @@ class SymbolTableEncodingServiceTest {
 
     @Test
     void decodeTest() {
-        BitList encodedSymbolTable = symbolTableEncodingService.encodeSymbolTable(exampleSymbolTable);
-        SymbolTable decodedSymbolTable = symbolTableEncodingService.decodeSymbolTable(encodedSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
+        SymbolTable decodedSymbolTable = symbolTableManagementService.decodeSymbolTable(encodedSymbolTable);
         assertEquals(exampleSymbolTable, decodedSymbolTable);
     }
 }
