@@ -58,8 +58,6 @@ class SymbolTableManagementServiceTest {
         int expectedBitSequenceLength = 32;
         expectedBitSequenceLength += 32 * exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         expectedBitSequenceLength += 64 * exampleSymbolTable.getTotalNumberOfDifferentSymbols();
-        System.out.println(encodedSymbolTable.toString());
-        System.out.println(expectedBitSequenceLength);
         assertEquals(expectedBitSequenceLength, encodedSymbolTable.size());
     }
 

@@ -56,7 +56,7 @@ public final class HuffmanTranslationTableGenerationService {
             long occurrency = symbolTable.getOccurrency(integerEncodedByte);
             assert integerEncodedByte >= 0;
             assert integerEncodedByte <= 255;
-            byte byteValue = (byte) integerEncodedByte.intValue();
+            int byteValue = integerEncodedByte;
             priorityQueue.add(new LeafHuffmanTreeNode(occurrency, byteValue));
         });
         return priorityQueue;

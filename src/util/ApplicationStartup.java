@@ -41,8 +41,8 @@ public class ApplicationStartup {
             }
         }
         catch(Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println(Arrays.toString(e.getStackTrace()));
+            logger.error(e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
             System.exit(1);
         }
     }
