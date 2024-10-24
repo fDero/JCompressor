@@ -2,7 +2,7 @@ package controller;
 
 import java.io.*;
 
-import io.github.fdero.bits4j.core.BitValue;
+import io.github.fdero.bits4j.stream.BitReader;
 import io.github.fdero.bits4j.stream.BitWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,7 @@ public class HuffmanEncodingController {
         File outputFileHandle = new File(outputFilePath);
         try (OutputStream outputFileStream = new FileOutputStream(outputFileHandle)) {
             BitWriter bitWriter = new BitWriter(outputFileStream);
-            symbolTableManagementService.writeEncodedSymbolTableToOutputFile(symbolTable, bitWriter);
+            symbolTableManagementService.writeSymbolTableOnCompressedFile(symbolTable, bitWriter);
             try (InputStream inputFileStream = new FileInputStream(inputFileHandle)) {
                 huffmanFileEncodingService.writeEncodedTextToOutputFile(inputFileStream, huffmanTranslationTable, bitWriter);
             }
@@ -49,12 +49,14 @@ public class HuffmanEncodingController {
     }
 
     public void decompress(String inputFilePath, String outputFilePath) throws IOException {
-        System.out.println("Dumping contents of the file:");
         File inputFileHandle = new File(inputFilePath);
         try (InputStream inputFileStream = new FileInputStream(inputFileHandle)) {
-            int integerEncodedByte;
-            while ((integerEncodedByte = inputFileStream.read()) != -1) {
-                System.out.println(integerEncodedByte);
+            BitReader inputFileBitReader = new BitReader(inputFileStream);
+            SymbolTable symbolTable = symbolTableManagementService.readSymbolTableFromCompressedFile(inputFileBitReader);
+            HuffmanTranslationTable huffmanTranslationTable = huffmanTranslationTableGenerator.generateTranslationTable(symbolTable);
+            File outputFileHandle = new File(outputFilePath);
+            try (OutputStream outputFileStream = new FileOutputStream(outputFileHandle)) {
+                huffmanFileEncodingService.readDecodedTextFromInputFile(outputFileStream, huffmanTranslationTable, inputFileBitReader);
             }
         }
     }

@@ -2,9 +2,12 @@ package service;
 
 import io.github.fdero.bits4j.core.BitList;
 import io.github.fdero.bits4j.core.BitListConversions;
+import io.github.fdero.bits4j.stream.BitListInputStream;
+import io.github.fdero.bits4j.stream.BitReader;
 import model.SymbolTable;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +54,7 @@ class SymbolTableManagementServiceTest {
 
     @Test
     void encodeSymbolTableOverallFormatTest() {
-        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.encodeSymbolTable(exampleSymbolTable);
         int expectedBitSequenceLength = 32;
         expectedBitSequenceLength += 32 * exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         expectedBitSequenceLength += 64 * exampleSymbolTable.getTotalNumberOfDifferentSymbols();
@@ -62,7 +65,7 @@ class SymbolTableManagementServiceTest {
 
     @Test
     void encodeSymbolTablePreambleContentTest() {
-        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.encodeSymbolTable(exampleSymbolTable);
         BitList first32bits = new BitList();
         first32bits.addAll(encodedSymbolTable.subList(0, 32));
         assertEquals(exampleSymbolTable.getTotalNumberOfDifferentSymbols(), BitListConversions.asInt(first32bits));
@@ -70,7 +73,7 @@ class SymbolTableManagementServiceTest {
 
     @Test
     void encodeSymbolTableAlphabetSectionContentTest() {
-        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.encodeSymbolTable(exampleSymbolTable);
         int totalNumberOfSymbols = exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         int bitOffset = 32;
         List<Integer> retrievedSymbols = new ArrayList<>();
@@ -90,7 +93,7 @@ class SymbolTableManagementServiceTest {
 
     @Test
     void encodeSymbolTableEncodedOccurrenciesSectionContentTest() {
-        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
+        BitList encodedSymbolTable = symbolTableManagementService.encodeSymbolTable(exampleSymbolTable);
         int totalNumberOfSymbols = exampleSymbolTable.getTotalNumberOfDifferentSymbols();
         int bitOffset = 32 + 32 * totalNumberOfSymbols;
         List<Long> retrievedOccurrencies = new ArrayList<>();
@@ -109,9 +112,10 @@ class SymbolTableManagementServiceTest {
     }
 
     @Test
-    void decodeTest() {
-        BitList encodedSymbolTable = symbolTableManagementService.writeEncodedSymbolTableToOutputFile(exampleSymbolTable);
-        SymbolTable decodedSymbolTable = symbolTableManagementService.decodeSymbolTable(encodedSymbolTable);
+    void decodeTest() throws IOException {
+        BitList encodedSymbolTable = symbolTableManagementService.encodeSymbolTable(exampleSymbolTable);
+        BitReader bitReader = new BitReader(new BitListInputStream(encodedSymbolTable));
+        SymbolTable decodedSymbolTable = symbolTableManagementService.readSymbolTableFromCompressedFile(bitReader);
         assertEquals(exampleSymbolTable, decodedSymbolTable);
     }
 }

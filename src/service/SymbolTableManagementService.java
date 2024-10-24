@@ -3,6 +3,7 @@ package service;
 import io.github.fdero.bits4j.core.BitList;
 import io.github.fdero.bits4j.core.BitListConversions;
 import io.github.fdero.bits4j.core.BitValue;
+import io.github.fdero.bits4j.stream.BitReader;
 import io.github.fdero.bits4j.stream.BitWriter;
 import model.SymbolTable;
 import model.SymbolTableBuilder;
@@ -14,38 +15,6 @@ import java.util.*;
 
 @Service
 public class SymbolTableManagementService {
-
-    public BitList writeEncodedSymbolTableToOutputFile(SymbolTable symbolTable) {
-        BitList encodedSymbolTable = new BitList();
-        encodedSymbolTable.addAll(BitListConversions.fromInt(symbolTable.getTotalNumberOfDifferentSymbols()));
-        symbolTable.streamFromMostFrequent().forEachOrdered(plainTextSymbol -> encodedSymbolTable.addAll(BitListConversions.fromInt(plainTextSymbol)));
-        symbolTable.streamOccurrenciesDesc().forEachOrdered(encodedSymbol -> encodedSymbolTable.addAll(BitListConversions.fromLong(encodedSymbol)));
-        return encodedSymbolTable;
-    }
-
-    public SymbolTable decodeSymbolTable(BitList encodedSymbolTable) {
-        Map<Integer, Long> occurrencyMap = new HashMap<>();
-        BitList first32bits = new BitList();
-        System.out.println(encodedSymbolTable.size());
-        first32bits.addAll(encodedSymbolTable.subList(0, 32));
-        int numberOfSymbols = BitListConversions.asInt(first32bits);
-        int expectedSize = numberOfSymbols * 32 + numberOfSymbols * 64 + 32;
-        assert expectedSize == encodedSymbolTable.size();
-        List<Integer> symbols = new ArrayList<>();
-        for (int i = 0; i < numberOfSymbols; i++) {
-            BitList textAsBits = new BitList();
-            textAsBits.addAll(encodedSymbolTable.subList(32 + i*32, 64 + i*32));
-            symbols.add(BitListConversions.asInt(textAsBits));
-        }
-        int offset = 32 + numberOfSymbols*32;
-        for (Integer symbol : symbols) {
-            BitList occurrencyAsBits = new BitList();
-            occurrencyAsBits.addAll(encodedSymbolTable.subList(offset, offset += 64));
-            long occurrency = BitListConversions.asLong(occurrencyAsBits);
-            occurrencyMap.put(symbol, occurrency);
-        }
-        return new SymbolTable(occurrencyMap);
-    }
 
     public SymbolTableBuilder createFromOccurrencyMap(Map<Integer, Long> occurrencyMap) {
         SymbolTableBuilder builder = new SymbolTableBuilder();
@@ -62,11 +31,50 @@ public class SymbolTableManagementService {
         return builder;
     }
 
-    public void writeEncodedSymbolTableToOutputFile(SymbolTable symbolTable, BitWriter bitWriter)
+    public void writeSymbolTableOnCompressedFile(SymbolTable symbolTable, BitWriter bitWriter)
             throws IOException
     {
-        for (BitValue bit : writeEncodedSymbolTableToOutputFile(symbolTable)) {
+        for (BitValue bit : encodeSymbolTable(symbolTable)) {
             bitWriter.write(bit);
         }
+    }
+
+    public BitList encodeSymbolTable(SymbolTable symbolTable) {
+        BitList encodedSymbolTable = new BitList();
+        encodedSymbolTable.addAll(BitListConversions.fromInt(symbolTable.getTotalNumberOfDifferentSymbols()));
+        symbolTable.streamFromMostFrequent().forEachOrdered(plainTextSymbol -> encodedSymbolTable.addAll(BitListConversions.fromInt(plainTextSymbol)));
+        symbolTable.streamOccurrenciesDesc().forEachOrdered(encodedSymbol -> encodedSymbolTable.addAll(BitListConversions.fromLong(encodedSymbol)));
+        return encodedSymbolTable;
+    }
+
+    public SymbolTable readSymbolTableFromCompressedFile(BitReader bitReader) throws IOException {
+        BitList first32bits = new BitList();
+        for (int i = 0; i < 32; i++) {
+
+            BitValue bit = bitReader.read();
+            first32bits.add(bit);
+        }
+        int numberOfSymbols = BitListConversions.asInt(first32bits);
+        Map<Integer, Long> occurrencyMap = new HashMap<>();
+        List<Integer> symbols = new ArrayList<>();
+        for (int i = 0; i < numberOfSymbols; i++) {
+            BitList textAsBits = new BitList();
+            for (int j = 0; j < 32; j++) {
+
+                textAsBits.add(bitReader.read());
+            }
+            symbols.add(BitListConversions.asInt(textAsBits));
+        }
+        assert symbols.size() == numberOfSymbols;
+        for (Integer symbol : symbols) {
+            BitList occurrencyAsBits = new BitList();
+            for (int j = 0; j < 64; j++) {
+
+                occurrencyAsBits.add(bitReader.read());
+            }
+            long occurrency = BitListConversions.asLong(occurrencyAsBits);
+            occurrencyMap.put(symbol, occurrency);
+        }
+        return new SymbolTable(occurrencyMap);
     }
 }
