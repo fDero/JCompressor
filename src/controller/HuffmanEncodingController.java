@@ -35,7 +35,7 @@ public class HuffmanEncodingController {
         File inputFileHandle = new File(inputFilePath);
         SymbolTable symbolTable;
         try (InputStream inputFileStream = new FileInputStream(inputFileHandle)) {
-            symbolTable = symbolTableManagementService.createFromInputStream(inputFileStream).withoutConsideringEOF();
+            symbolTable = symbolTableManagementService.createFromInputStream(inputFileStream).consideringEOF();
         }
         HuffmanTranslationTable huffmanTranslationTable = huffmanTranslationTableGenerator.generateTranslationTable(symbolTable);
         File outputFileHandle = new File(outputFilePath);

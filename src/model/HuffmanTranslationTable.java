@@ -27,6 +27,10 @@ public class HuffmanTranslationTable {
         });
     }
 
+    public BitList getHuffmanSequenceForEOF() {
+        return translationMap.getOrDefault(-1, new BitList());
+    }
+
     public BitList getHuffmanSequenceFromSymbol(Integer integerEncodedByte) {
         return translationMap.get(integerEncodedByte);
     }

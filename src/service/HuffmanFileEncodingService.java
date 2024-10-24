@@ -24,6 +24,9 @@ public class HuffmanFileEncodingService {
                 bitWriter.write(bit);
             }
         }
+        for (BitValue bit : translationTable.getHuffmanSequenceForEOF()) {
+            bitWriter.write(bit);
+        }
         bitWriter.addPadding();
         bitWriter.flush();
     }
