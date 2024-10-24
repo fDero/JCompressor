@@ -116,7 +116,7 @@
         <dependency>
             <groupId>io.github.fdero</groupId>
             <artifactId>bits4j</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 </project>
