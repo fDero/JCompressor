@@ -4,6 +4,8 @@ import java.io.*;
 
 import io.github.fdero.bits4j.stream.BitReader;
 import io.github.fdero.bits4j.stream.BitWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -12,9 +14,12 @@ import model.SymbolTable;
 import service.HuffmanFileEncodingService;
 import service.HuffmanTranslationTableGenerationService;
 import service.SymbolTableManagementService;
+import util.ApplicationStartup;
 
 @Controller
 public class HuffmanEncodingController {
+
+    private static final Logger logger = LoggerFactory.getLogger(HuffmanEncodingController.class);
 
     private final SymbolTableManagementService symbolTableManagementService;
     private final HuffmanTranslationTableGenerationService huffmanTranslationTableGenerator;
@@ -32,6 +37,7 @@ public class HuffmanEncodingController {
     }
 
     public void compress(String inputFilePath, String outputFilePath) throws IOException {
+        logger.info("starting Huffman-compression of the input-file");
         File inputFileHandle = new File(inputFilePath);
         SymbolTable symbolTable;
         try (InputStream inputFileStream = new FileInputStream(inputFileHandle)) {
@@ -49,6 +55,7 @@ public class HuffmanEncodingController {
     }
 
     public void decompress(String inputFilePath, String outputFilePath) throws IOException {
+        logger.info("starting Huffman-decompression of the input-file");
         File inputFileHandle = new File(inputFilePath);
         try (InputStream inputFileStream = new FileInputStream(inputFileHandle)) {
             BitReader inputFileBitReader = new BitReader(inputFileStream);

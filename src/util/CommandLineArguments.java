@@ -17,7 +17,7 @@ public class CommandLineArguments {
     @Option(name = "-o", aliases = "--output", required = true, usage = "Output file path")
     private String outputFilePath;
 
-    @Option(name = "-t", aliases = "--task", required = false, usage = "Policy explaining output file should be derived from the input file")
+    @Option(name = "-t", aliases = "--task", required = true, usage = "Policy explaining output file should be derived from the input file")
     private ApplicationTask task;
 
     public void parse(String[] args) {
@@ -32,20 +32,8 @@ public class CommandLineArguments {
     }
 
     public void validate() {
-        if (task == null) {
-            System.err.println("Task is not specified");
-            System.exit(1);
-        }
         if (!Paths.get(inputFilePath).toFile().exists()) {
             System.err.println("Input file does not exist");
-            System.exit(1);
-        }
-        if (!Paths.get(outputFilePath).toFile().exists()) {
-            System.err.println("Output file does not exist");
-            System.exit(1);
-        }
-        if (!Files.isWritable(Paths.get(this.outputFilePath))) {
-            System.err.println("Output file is not writable");
             System.exit(1);
         }
         if (!Files.isReadable(Paths.get(this.inputFilePath))) {

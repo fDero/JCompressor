@@ -1,5 +1,7 @@
 package service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.PriorityQueue;
@@ -16,6 +18,8 @@ import model.SymbolTable;
 
 @Service
 public final class HuffmanTranslationTableGenerationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(HuffmanTranslationTableGenerationService.class);
 
     sealed interface HuffmanTreeNode
         extends Comparable<HuffmanTreeNode>
@@ -84,6 +88,7 @@ public final class HuffmanTranslationTableGenerationService {
     }
 
     public HuffmanTranslationTable generateTranslationTable(SymbolTable symbolTable) {
+        logger.info("generating the Huffman-translation-table...");
         HuffmanTreeNode huffmanTree = generateHuffmanTree(symbolTable);
         Map<Integer, BitList> translationMap = new HashMap<>();
         fillHuffmanTranslationTableFromHuffmanTree(translationMap, huffmanTree, new BitList());
