@@ -14,7 +14,6 @@ import model.SymbolTable;
 import service.HuffmanFileEncodingService;
 import service.HuffmanTranslationTableGenerationService;
 import service.SymbolTableManagementService;
-import util.ApplicationStartup;
 
 @Controller
 public class HuffmanEncodingController {

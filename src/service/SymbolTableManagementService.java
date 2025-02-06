@@ -1,6 +1,5 @@
 package service;
 
-import controller.HuffmanEncodingController;
 import io.github.fdero.bits4j.core.BitList;
 import io.github.fdero.bits4j.core.BitListConversions;
 import io.github.fdero.bits4j.core.BitValue;
