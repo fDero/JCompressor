@@ -1,17 +1,26 @@
+# java-related-ignores
+target
 *.class
-*.log
-*.ctxt
-.mtj.tmp/
 *.jar
 *.war
 *.nar
 *.ear
+
+
+# archive-related-ignores
 *.zip
 *.tar.gz
 *.rar
-hs_err_pid*
-replay_pid*
-target
+
+# text/log-related-ignores
+*.log
+*.ctxt
+*.txt
+
+# IDE-related-ignores
 .idea
 .vscode
-ignored
+
+# put stuff you don't want to commit here
+ignored/*
+ignored*
