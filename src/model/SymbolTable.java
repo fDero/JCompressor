@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.springframework.cache.annotation.Cacheable;
+
 public class SymbolTable {
 
     private final Map<Integer, Long> occurrencyMap;
@@ -30,6 +32,7 @@ public class SymbolTable {
             0 : getOccurrency(integerEncodedByte) / (double) totalNumberOfOccurrencies;
     }
 
+    @Cacheable(value="LowerCumulativeFrequencies", key="#integerEncodedByte + '-' + #uniqueTableId")
     public double getLowerCumulativeFrequency(int integerEncodedByte) {
         double cumulativeFrequency = 0;
         for (Map.Entry<Integer, Long> entry : occurrencyMap.entrySet()) {
@@ -41,6 +44,7 @@ public class SymbolTable {
         return cumulativeFrequency;
     }
 
+    @Cacheable(value="UpperCumulativeFrequencies", key="#integerEncodedByte + '-' + #uniqueTableId")
     public double getUpperCumulativeFrequency(int integerEncodedByte) {
         return getLowerCumulativeFrequency(integerEncodedByte) + getFrequency(integerEncodedByte);
     }

@@ -25,7 +25,7 @@ public class CacheConfig {
     @Bean
     @SuppressWarnings("unchecked")
     public CaffeineCacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("cumulativeFrequencies", "cumulativeOccurrences");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("UpperCumulativeFrequencies", "LowerCumulativeFrequencies");
         cacheManager.setCaffeine(caffeineConfig());
         return cacheManager;
     }
